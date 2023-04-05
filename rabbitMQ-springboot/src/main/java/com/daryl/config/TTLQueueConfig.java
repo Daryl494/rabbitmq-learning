@@ -24,6 +24,8 @@ public class TTLQueueConfig {
     public static final String QUEUE_B = "QB";
     // 死信队列名称
     public static final String DEAD_LETTER_QUEUE = "QD";
+    // 新的普通队列（尝试用普通队列+消息ddl来实现延时队列）
+    public static final String QUEUE_C = "QC";
 
     // 声明x交换机
     @Bean("xExchange")
@@ -90,10 +92,25 @@ public class TTLQueueConfig {
     public Binding queueBBindingX(@Qualifier("queueB") Queue queueB, @Qualifier("xExchange") DirectExchange xExchange) {
         return BindingBuilder.bind(queueB).to(xExchange).with("XB");
     }
+
     // 绑定死信队列和其交换机
     @Bean
     public Binding queueDBindingY(@Qualifier("queueD") Queue queueD, @Qualifier("yExchange") DirectExchange yExchange) {
         return BindingBuilder.bind(queueD).to(yExchange).with("YD");
+    }
+
+    @Bean
+    public Queue queueC() {
+        return QueueBuilder
+                .durable(QUEUE_C)   // 队列名称
+                .deadLetterExchange(Y_DEAD_LETTER_EXCHANGE) // 死信交换机
+                .deadLetterRoutingKey("YD") //死信队列routingKey
+                .build();
+    }
+
+    @Bean
+    public Binding queueCBindingX(@Qualifier("queueC") Queue queueC, @Qualifier("xExchange") DirectExchange xExchange) {
+        return BindingBuilder.bind(queueC).to(xExchange).with("XC");
     }
 
 }
