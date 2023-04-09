@@ -1,6 +1,8 @@
 spring:
   rabbitmq:
-    host: 192.168.1.104
+    host: 192.168.1.102
     port: 5672
     username: admin
     password: 123
+    publisher-confirm-type: correlated  #配置发布确认，默认为none，即关闭发布确认
+    publisher-returns: true   # 消息回退机制，默认为关闭。在交换机找不到队列时的回调
